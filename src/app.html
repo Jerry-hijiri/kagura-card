@@ -42,10 +42,10 @@ kbd{font-family:var(--body);font-size:12px;font-weight:500;line-height:1;padding
 .screen{min-height:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 
 /* ---- title ---- */
-.title{position:relative;overflow:hidden;display:grid;place-items:center;padding-block:128px 48px;background:radial-gradient(ellipse 70% 55% at 50% 0%,rgba(210,74,44,.22),transparent 70%),var(--bg)}
+.title{position:relative;overflow:hidden;display:grid;place-items:start center;padding-block:168px 48px;background:radial-gradient(ellipse 70% 55% at 50% 0%,rgba(210,74,44,.22),transparent 70%),var(--bg)}
 .title::after{content:"";position:absolute;inset:auto 0 0 0;height:44%;background-image:var(--seigaiha);-webkit-mask-image:linear-gradient(to top,#000 0%,transparent 100%);mask-image:linear-gradient(to top,#000 0%,transparent 100%);pointer-events:none}
 .shime{position:absolute;top:0;left:0;width:100%;height:152px;pointer-events:none}
-.title-grid{position:relative;z-index:1;display:grid;grid-template-columns:auto minmax(0,560px);gap:clamp(32px,6vw,64px);align-items:center;width:100%;max-width:960px}
+.title-grid{position:relative;z-index:1;display:grid;grid-template-columns:auto minmax(0,560px);gap:clamp(32px,6vw,64px);align-items:start;width:100%;max-width:960px}
 .logo-col{display:flex;gap:24px;align-items:flex-start;justify-content:center}
 .logo{writing-mode:vertical-rl;font-family:var(--display);font-weight:800;font-size:clamp(64px,9vw,116px);line-height:1;letter-spacing:.08em;margin:0;text-shadow:0 0 48px rgba(210,74,44,.35)}
 .logo-side{writing-mode:vertical-rl;display:flex;gap:16px;align-items:flex-start;padding-top:8px}
@@ -67,7 +67,21 @@ kbd{font-family:var(--body);font-size:12px;font-weight:500;line-height:1;padding
 .rules li{padding-left:16px;position:relative}
 .rules li::before{content:"";position:absolute;left:0;top:10px;width:6px;height:6px;background:var(--accent);transform:rotate(45deg)}
 .rules b{color:var(--fg);font-weight:500}
-.start-row{display:flex;gap:12px;align-items:center;margin-top:24px;flex-wrap:wrap}
+.mode-row{display:grid;gap:12px;margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
+.mode-label{font-size:12px;color:var(--muted);letter-spacing:.08em}
+.seg{display:flex;padding:4px;border-radius:var(--r-m);background:var(--bg-2);border:1px solid var(--line-2);gap:4px;flex-wrap:wrap;justify-self:start}
+.seg-b{border:0;background:transparent;padding:8px 16px;border-radius:var(--r-s);cursor:pointer;color:var(--muted);font-weight:500}
+.seg-b:hover{color:var(--fg)}
+.seg-b[aria-checked="true"]{background:var(--surface-3);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line-2)}
+.cpu-opts{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted);min-height:36px}
+.cpu-opts label{display:flex;gap:8px;align-items:center}
+.cpu-opts .select{padding:4px 8px;font-size:14px}
+.start-row{display:flex;gap:12px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.sim-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.sim-note{font-size:12px;color:var(--faint);margin:0 0 16px}
+.sim-insight{list-style:none;margin:0 0 16px;padding:12px 16px;border-radius:var(--r-m);background:var(--surface-2);display:grid;gap:4px}
+.sim-insight b{color:var(--gold-2);font-weight:500}
+@media (max-width:560px){.sim-form{grid-template-columns:1fr}}
 @media (max-width:760px){
   .title{padding-block:120px 32px}
   .title-grid{grid-template-columns:1fr}
@@ -94,6 +108,9 @@ kbd{font-family:var(--body);font-size:12px;font-weight:500;line-height:1;padding
 .p2{--pc:var(--p2);--pcs:var(--p2-soft)}
 .pp-head{display:flex;align-items:center;gap:8px;min-height:32px}
 .pp-key{width:24px;height:24px;flex:none;border-radius:var(--r-s);display:grid;place-items:center;font-weight:700;font-size:12px;background:var(--pc);color:var(--on-p)}
+.pp-key.wide{width:auto;padding:0 8px;letter-spacing:.06em}
+.pp.seeking .pp-name::after{content:"";display:inline-block;width:6px;height:6px;margin-left:8px;border-radius:50%;background:var(--pc);vertical-align:middle;animation:seek 1s ease-in-out infinite}
+@keyframes seek{50%{opacity:.15}}
 .pp-name{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .pp-score{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
 .pp-score b{font-family:var(--display);font-weight:800;font-size:32px;color:var(--fg);font-variant-numeric:tabular-nums;margin-right:2px;line-height:1}
@@ -248,7 +265,7 @@ kbd{font-family:var(--body);font-size:12px;font-weight:500;line-height:1;padding
 .switch:checked::after{transform:translateX(20px)}
 
 /* records */
-.rec-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.rec-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:8px;margin-bottom:16px}
 .rec-sum div{background:var(--surface-2);border-radius:var(--r-m);padding:12px}
 .rec-sum b{display:block;font-family:var(--display);font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.3}
 .rec-sum span{font-size:12px;color:var(--muted)}
@@ -318,13 +335,14 @@ kbd{font-family:var(--body);font-size:12px;font-weight:500;line-height:1;padding
         <button class="tab" role="tab" id="tab-how" aria-selected="true" data-tab="how">あそびかた</button>
         <button class="tab" role="tab" id="tab-set" aria-selected="false" data-tab="set">設定</button>
         <button class="tab" role="tab" id="tab-rec" aria-selected="false" data-tab="rec">対局記録</button>
+        <button class="tab" role="tab" id="tab-sim" aria-selected="false" data-tab="sim">シミュレーション</button>
       </div>
       <div class="tpanel" data-panel="how">
         <div class="how-grid">
           <ol class="steps">
             <li class="step"><span class="step-n">1</span><div><h3>読み札を聞く</h3><p>コンピューターが読み札を読み上げます。次の札は <kbd>Space</kbd></p></div></li>
             <li class="step"><span class="step-n">2</span><div><h3>札のキーを押す</h3><p>読まれた神様の札を探して、右上のキーを相手より先に押す</p></div></li>
-            <li class="step"><span class="step-n">3</span><div><h3>取った人を決める</h3><p><kbd>1</kbd> か <kbd>2</kbd> で、取った人を選びます</p></div></li>
+            <li class="step"><span class="step-n">3</span><div><h3>取った人を決める</h3><p><kbd>1</kbd> か <kbd>2</kbd> で取った人を選ぶ（人対CPUでは不要）</p></div></li>
           </ol>
           <div class="sample" id="sample"></div>
         </div>
@@ -337,6 +355,25 @@ kbd{font-family:var(--body);font-size:12px;font-weight:500;line-height:1;padding
       </div>
       <div class="tpanel" data-panel="set" hidden><div id="set-title"></div></div>
       <div class="tpanel" data-panel="rec" hidden><div id="rec-title"></div></div>
+      <div class="tpanel" data-panel="sim" hidden>
+        <p class="sim-note">CPU同士で何局も一瞬で対戦させ、役ごとの成立率を集計します。切り札・お手つきは「設定」タブの内容で計算します。</p>
+        <div class="sim-form">
+          <label class="field">対局数<select class="select" id="sim-n"><option value="100">100局</option><option value="1000" selected>1,000局</option><option value="5000">5,000局</option></select></label>
+          <label class="field">CPU A の強さ<select class="select" id="sim-a"></select></label>
+          <label class="field">CPU B の強さ<select class="select" id="sim-b"></select></label>
+        </div>
+        <button class="btn primary" data-act="run-sim">シミュレーションを実行</button>
+        <div id="sim-out" style="margin-top:24px"></div>
+      </div>
+      <div class="mode-row" id="mode-row">
+        <span class="mode-label">対戦の組み合わせ</span>
+        <div class="seg" role="radiogroup" aria-label="対戦の組み合わせ">
+          <button class="seg-b" role="radio" aria-checked="true" data-mode="hh">人 対 人</button>
+          <button class="seg-b" role="radio" aria-checked="false" data-mode="hc">人 対 CPU</button>
+          <button class="seg-b" role="radio" aria-checked="false" data-mode="cc">CPU 対 CPU（観戦）</button>
+        </div>
+        <div class="cpu-opts" id="cpu-opts"></div>
+      </div>
       <div class="start-row">
         <button class="btn primary big" data-act="start">はじめる <kbd>Enter</kbd></button>
         <button class="btn ghost" data-act="open-yaku">役一覧を見る</button>
@@ -372,6 +409,8 @@ kbd{font-family:var(--body);font-size:12px;font-weight:500;line-height:1;padding
         <button class="btn primary" data-act="next" id="b-next">次の札 <kbd>Space</kbd></button>
         <button class="btn ghost" data-act="reread" id="b-reread">もう一度 <kbd>Enter</kbd></button>
         <button class="btn ghost" data-act="hint" id="b-hint">ヒント</button>
+        <button class="btn primary" data-act="pause" id="b-pause" hidden>一時停止 <kbd>Space</kbd></button>
+        <button class="btn ghost" data-act="speed" id="b-speed" hidden>速さ 1倍</button>
       </div>
     </div>
     <div class="pp p2" id="pp1" data-act="choose-1"></div>
@@ -428,7 +467,7 @@ const fmtDate = ts => { const d = new Date(ts); return `${d.getFullYear()}-${pad
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 /* ===== 設定（このブラウザに保存） ===== */
-const DEFAULTS = { p1: 'プレイヤー1', p2: 'プレイヤー2', wildcard: true, penalty: 'returnCard', speak: true, rate: 1, reveal: 'sync', sfx: true, autoNext: false };
+const DEFAULTS = { p1: 'プレイヤー1', p2: 'プレイヤー2', wildcard: true, penalty: 'returnCard', speak: true, rate: 1, reveal: 'sync', sfx: true, autoNext: false, mode: 'hh', cpu1: 'normal', cpu2: 'normal', speed: 1 };
 const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
@@ -503,6 +542,41 @@ const YAKU = [
   { name: '天若彦', cards: ['ゆ'] }
 ];
 const YAKU_BY = {}; YAKU.forEach(y => { YAKU_BY[y.name] = y; });
+const YAKU_OF = {}; CARDS.forEach(c => { YAKU_OF[c.id] = YAKU.filter(y => y.cards.includes(c.id)); });
+
+/* ===== ルール（実対局とシミュレーションで共用） ===== */
+// has(id): 手札にあるか / scored: 成立済みの役名 / candidates: 調べる役
+function newYaku(has, scored, wildcardOn, candidates = YAKU) {
+  const out = [];
+  candidates.forEach(y => {
+    if (scored.includes(y.name)) return;
+    const miss = y.cards.filter(c => !has(c)).length;
+    const wild = wildcardOn && miss === 1 && y.cards.length >= 2 && has(WILD);
+    if (miss === 0 || wild) out.push({ y, wild });
+  });
+  return out;
+}
+// 点数 → 取り札の枚数の順で勝者を決める。引き分けは null
+const winnerOf = ps => ps[0].score !== ps[1].score ? (ps[0].score > ps[1].score ? 0 : 1) : ps[0].cards !== ps[1].cards ? (ps[0].cards > ps[1].cards ? 0 : 1) : null;
+
+/* ===== CPU ===== */
+// mean: 読み始めから取るまでの平均秒数 / foul: 違う札に手を出す確率
+// 1枚を競ったとき、つよい対ふつうで約66%、つよい対よわいで約78%つよい方が取る
+const CPU = {
+  weak: { label: 'よわい', mean: 2.6, foul: 0.07 },
+  normal: { label: 'ふつう', mean: 2.0, foul: 0.04 },
+  strong: { label: 'つよい', mean: 1.5, foul: 0.02 }
+};
+const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+const cpuDelay = (st, factor = 1) => CPU[st].mean * Math.exp(gauss() * 0.5) * factor;
+const cpuOptions = sel => Object.entries(CPU).map(([k, v]) => `<option value="${k}"${k === sel ? ' selected' : ''}>${v.label}</option>`).join('');
+function seats() {
+  const m = settings.mode;
+  const cpu = (st, tag) => ({ type: 'cpu', strength: st, name: `CPU${tag}（${CPU[st].label}）` });
+  if (m === 'hc') return [{ type: 'human', name: settings.p1 }, cpu(settings.cpu2, '')];
+  if (m === 'cc') return [cpu(settings.cpu1, ' A'), cpu(settings.cpu2, ' B')];
+  return [{ type: 'human', name: settings.p1 }, { type: 'human', name: settings.p2 }];
+}
 
 /* ===== 紋（札の絵・100×100） ===== */
 const DOTS = [[50, 20], [31, 32], [69, 32], [50, 44], [22, 54], [40, 60], [60, 60], [78, 54], [31, 78], [50, 74], [69, 78]];
@@ -606,35 +680,88 @@ function speechStop() { utter = null; try { if (canSpeak) speechSynthesis.cancel
 
 /* ===== 状態 ===== */
 let S = null, screen = 'title', openM = null;
-let revealRaf = 0, toastTimer = 0, autoTimer = 0;
+let revealRaf = 0, toastTimer = 0, autoTimer = 0, cpuTimers = [];
 const ui = {};
 
-const mkPlayer = name => ({ name, hand: [], score: 0, scored: [], fouls: 0, times: [] });
+const mkPlayer = seat => ({ name: seat.name, type: seat.type, strength: seat.strength || null, hand: [], score: 0, scored: [], fouls: 0, times: [] });
 function newState() {
   const ids = CARDS.map(c => c.id);
   return {
-    phase: 'idle', slots: shuffle(ids), field: ids.slice(), queue: shuffle(ids),
+    mode: settings.mode, phase: 'idle', paused: false, slots: shuffle(ids), field: ids.slice(), queue: shuffle(ids),
     current: null, readAt: 0, reads: 0, pending: null, lastTake: null,
-    players: [mkPlayer(settings.p1), mkPlayer(settings.p2)],
+    players: seats().map(mkPlayer),
     log: [], startedAt: Date.now(), endedAt: 0, hints: 0, saved: false
   };
+}
+const humans = () => S.players.map((p, i) => p.type === 'human' ? i : -1).filter(i => i >= 0);
+const spectating = () => !!S && S.mode === 'cc';
+const speed = () => spectating() ? settings.speed : 1;
+
+/* ===== CPUの手番 ===== */
+function clearCpu() { cpuTimers.forEach(clearTimeout); cpuTimers = []; }
+function scheduleCpu(factor = 1) {
+  clearCpu();
+  if (!S || S.phase !== 'reading' || S.paused) return;
+  const g = S, cur = S.current;
+  S.players.forEach((p, pi) => {
+    if (p.type !== 'cpu') return;
+    const foul = Math.random() < CPU[p.strength].foul;
+    const t = cpuDelay(p.strength, factor) * (foul ? 0.7 : 1) / speed();
+    cpuTimers.push(setTimeout(() => cpuAct(g, cur, pi, foul), t * 1000));
+  });
+  renderPanels();
+}
+function cpuAct(g, cur, pi, foul) {
+  if (S !== g || S.phase !== 'reading' || S.current !== cur || S.paused) return;
+  let id = cur;
+  if (foul) { const others = S.field.filter(x => x !== cur); if (others.length) id = others[Math.floor(Math.random() * others.length)]; }
+  take(pi, id);
+}
+function take(pi, id) {
+  if (!S || S.phase !== 'reading' || !S.field.includes(id)) return;
+  S.pending = id; S.phase = 'pick';
+  resolve(pi);
+}
+function scheduleNext(delay) {
+  clearTimeout(autoTimer);
+  const g = S;
+  afterBanners(() => {
+    autoTimer = setTimeout(() => { if (S === g && S.phase === 'idle' && !S.paused) nextCard(); }, delay);
+  });
+}
+function togglePause() {
+  if (!spectating() || S.phase === 'over') return;
+  S.paused = !S.paused;
+  if (S.paused) { clearCpu(); clearTimeout(autoTimer); speechStop(); stopReveal(true); }
+  else if (S.phase === 'reading') { ui.yHint.textContent = 'CPUが札を探しています'; scheduleCpu(1); }
+  else if (S.phase === 'idle') { ui.yHint.textContent = 'まもなく次の札'; scheduleNext(300); }
+  renderAll();
+}
+function cycleSpeed() {
+  if (!spectating()) return;
+  settings.speed = settings.speed === 1 ? 2 : settings.speed === 2 ? 4 : 1;
+  saveSettings();
+  if (S.phase === 'reading') { speechStop(); stopReveal(true); scheduleCpu(1); }
+  renderAll();
 }
 
 /* ===== 進行 ===== */
 function startGame() {
-  closeModal(); audio(); speechStop(); clearTimeout(autoTimer);
+  closeModal(); audio(); speechStop(); clearTimeout(autoTimer); clearCpu();
   bannerQ.length = 0; bannerDone = null; ui.banner.hidden = true;
   S = newState();
   showScreen('game');
   buildBoard(); setYomiIdle(); renderAll();
-  log('対局開始', 'sys'); sfx('start');
+  log(`対局開始（${S.players.map(p => p.name).join(' 対 ')}）`, 'sys'); sfx('start');
+  if (spectating()) scheduleNext(900);
 }
 function nextCard() {
-  if (!S || S.phase !== 'idle' || !S.queue.length) return;
+  if (!S || S.phase !== 'idle' || S.paused || !S.queue.length) return;
   clearTimeout(autoTimer);
   S.current = S.queue.pop(); S.phase = 'reading'; S.readAt = performance.now(); S.reads++;
   showYomi(BY_ID[S.current], true);
   renderAll();
+  scheduleCpu(1);
 }
 function reread() {
   if (!S || S.phase !== 'reading') return;
@@ -652,8 +779,11 @@ function hint() {
 }
 function pickCard(id) {
   if (!S) return;
+  const hs = humans();
+  if (!hs.length) { toast('観戦中です。Space で一時停止できます'); return; }
   if (S.phase === 'idle') { toast(S.reads ? 'Space で次の札を読んでから取ります' : 'Space で最初の札を読みます'); return; }
   if (S.phase !== 'reading' || !S.field.includes(id)) return;
+  if (hs.length === 1) { sfx('tap'); take(hs[0], id); return; }
   S.pending = id; S.phase = 'pick';
   slotEl(id).classList.add('sel');
   showPick(id); sfx('tap'); renderPanels();
@@ -667,7 +797,7 @@ function cancelPick() {
 function resolve(pi) {
   if (!S || S.phase !== 'pick') return;
   const id = S.pending, p = S.players[pi], slot = slotEl(id);
-  slot.classList.remove('sel'); S.pending = null; hidePick();
+  slot.classList.remove('sel'); S.pending = null; hidePick(); clearCpu();
   if (id === S.current) {
     const t = (performance.now() - S.readAt) / 1000;
     S.field.splice(S.field.indexOf(id), 1); p.hand.push(id); p.times.push(t);
@@ -682,8 +812,9 @@ function resolve(pi) {
     setYomiTaken();
     renderAll();
     const g = S, wait = got.length * 2300;
-    if (!S.field.length) { setTimeout(() => { if (S === g) finish(); }, 900); return; }
-    if (settings.autoNext) autoTimer = setTimeout(() => { if (S === g && S.phase === 'idle' && !openM) nextCard(); }, 1500 + wait);
+    if (!S.field.length) { setTimeout(() => { if (S === g) finish(); }, 900 / speed()); return; }
+    if (spectating()) scheduleNext(1200 / speed());
+    else if (settings.autoNext) autoTimer = setTimeout(() => { if (S === g && S.phase === 'idle' && !openM) nextCard(); }, 1500 + wait);
   } else {
     p.fouls++; S.phase = 'reading';
     log(`${p.name} のお手つき（「${cardLabel(id)}」は違う札）`, 'foul', pi);
@@ -701,23 +832,20 @@ function resolve(pi) {
     }
     toast(msg, 'bad');
     renderAll();
+    scheduleCpu(0.6);
   }
 }
 function checkYaku(pi) {
-  const p = S.players[pi], got = [];
-  YAKU.forEach(y => {
-    if (p.scored.includes(y.name)) return;
-    const miss = y.cards.filter(c => !p.hand.includes(c)).length;
-    const wild = settings.wildcard && miss === 1 && y.cards.length >= 2 && p.hand.includes(WILD);
-    if (miss === 0 || wild) {
-      p.scored.push(y.name); p.score += y.cards.length; got.push(y);
-      log(`${p.name}：役「${y.name}」成立 +${y.cards.length}点${wild ? '（切り札使用）' : ''}`, 'yaku', pi);
-    }
+  const p = S.players[pi];
+  return newYaku(c => p.hand.includes(c), p.scored, settings.wildcard).map(({ y, wild }) => {
+    p.scored.push(y.name); p.score += y.cards.length;
+    log(`${p.name}：役「${y.name}」成立 +${y.cards.length}点${wild ? '（切り札使用）' : ''}`, 'yaku', pi);
+    return y;
   });
-  return got;
 }
 function finish() {
   if (!S || S.phase === 'over') return;
+  clearCpu(); clearTimeout(autoTimer);
   S.phase = 'over'; S.endedAt = Date.now();
   speechStop(); record(); log('対局終了', 'sys');
   const g = S;
@@ -738,15 +866,16 @@ function record() {
   if (S.saved) return; S.saved = true;
   const recs = store.get('kagura.records', []);
   recs.push({
-    at: S.startedAt, dur: Math.round((S.endedAt - S.startedAt) / 1000), wildcard: settings.wildcard, penalty: settings.penalty, hints: S.hints,
-    players: S.players.map(p => ({ name: p.name, score: p.score, cards: p.hand.length, fouls: p.fouls, yaku: p.scored.slice() }))
+    at: S.startedAt, dur: Math.round((S.endedAt - S.startedAt) / 1000), wildcard: settings.wildcard, penalty: settings.penalty, hints: S.hints, mode: S.mode,
+    players: S.players.map(p => ({ name: p.name, type: p.type, strength: p.strength, score: p.score, cards: p.hand.length, fouls: p.fouls, yaku: p.scored.slice() }))
   });
   store.set('kagura.records', recs.slice(-300));
 }
 function csv() {
   const recs = store.get('kagura.records', []);
-  const head = ['日時', '所要秒', '切り札', 'お手つき', 'P1', 'P1点', 'P1札', 'P1お手つき', 'P1役', 'P2', 'P2点', 'P2札', 'P2お手つき', 'P2役', 'ヒント'];
-  const rows = recs.map(r => [fmtDate(r.at), r.dur, r.wildcard ? 'ON' : 'OFF', r.penalty === 'returnCard' ? '1枚返す' : 'なし', ...r.players.flatMap(p => [p.name, p.score, p.cards, p.fouls, p.yaku.join(' / ')]), r.hints]);
+  const MODE = { hh: '人対人', hc: '人対CPU', cc: 'CPU対CPU' };
+  const head = ['日時', '対戦', '所要秒', '切り札', 'お手つき', 'P1', 'P1点', 'P1札', 'P1お手つき', 'P1役', 'P2', 'P2点', 'P2札', 'P2お手つき', 'P2役', 'ヒント'];
+  const rows = recs.map(r => [fmtDate(r.at), MODE[r.mode || 'hh'], r.dur, r.wildcard ? 'ON' : 'OFF', r.penalty === 'returnCard' ? '1枚返す' : 'なし', ...r.players.flatMap(p => [p.name, p.score, p.cards, p.fouls, p.yaku.join(' / ')]), r.hints]);
   return [head, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
 }
 function resultText() {
@@ -784,7 +913,8 @@ function fitBoard() {
 /* ===== 描画：陣・進行 ===== */
 function panelHTML(pi) {
   const p = S.players[pi], near = nearYaku(pi);
-  return `<div class="pp-head"><span class="pp-key">${pi + 1}</span><span class="pp-name">${esc(p.name)}</span><span class="pp-score"><b>${p.score}</b>点</span></div>`
+  const badge = p.type === 'cpu' ? '<span class="pp-key wide">CPU</span>' : humans().length === 1 ? '<span class="pp-key wide">あなた</span>' : `<span class="pp-key">${pi + 1}</span>`;
+  return `<div class="pp-head">${badge}<span class="pp-name">${esc(p.name)}</span><span class="pp-score"><b>${p.score}</b>点</span></div>`
     + `<div class="pp-meta"><span>取り札 <b>${p.hand.length}</b></span><span>お手つき <b>${p.fouls}</b></span>${p.hand.includes(WILD) ? '<span class="wild">切り札あり</span>' : ''}</div>`
     + `<div class="pp-seals">${p.scored.length ? p.scored.map(n => `<span class="seal-y">${esc(n)}</span>`).join('') : '<span class="pp-empty">役はまだありません</span>'}</div>`
     + `<div class="pp-near">${near.map(x => `<div class="near${x.need - x.have === 1 ? ' reach' : ''}"><span class="near-n">${esc(x.y.name)}</span><span class="near-bar"><i style="width:${Math.round(x.have / x.need * 100)}%"></i></span><span class="near-c">${x.have}/${x.need}</span></div>`).join('')}</div>`;
@@ -793,6 +923,7 @@ function renderPanels() {
   [0, 1].forEach(pi => {
     ui.pp[pi].innerHTML = panelHTML(pi);
     ui.pp[pi].classList.toggle('choosable', S.phase === 'pick');
+    ui.pp[pi].classList.toggle('seeking', S.players[pi].type === 'cpu' && S.phase === 'reading' && !S.paused);
   });
 }
 function renderAll() {
@@ -801,9 +932,18 @@ function renderAll() {
   ui.nRead.textContent = S.reads;
   ui.nField.textContent = S.field.length;
   ui.flags.textContent = `切り札 ${settings.wildcard ? 'ON' : 'OFF'} · お手つき ${settings.penalty === 'returnCard' ? '1枚返す' : 'なし'}`;
+  const spec = spectating();
+  [ui.bNext, ui.bReread, ui.bHint].forEach(b => { b.hidden = spec; });
+  [ui.bPause, ui.bSpeed].forEach(b => { b.hidden = !spec; });
   ui.bNext.disabled = !(S.phase === 'idle' && S.queue.length);
   ui.bReread.disabled = S.phase !== 'reading';
   ui.bHint.disabled = S.phase !== 'reading';
+  if (spec) {
+    ui.bPause.innerHTML = `${S.paused ? '再開' : '一時停止'} <kbd>Space</kbd>`;
+    ui.bPause.disabled = S.phase === 'over';
+    ui.bSpeed.textContent = `速さ ${settings.speed}倍`;
+    if (S.paused) ui.yHint.textContent = '一時停止中 — Space で再開';
+  }
   if (openM === 'm-yaku') renderYaku();
   if (openM === 'm-log') renderLog();
 }
@@ -816,28 +956,29 @@ function setYomi(cls, stamp, label, html, hintHtml) {
 }
 function setYomiIdle() {
   stopReveal(false);
-  setYomi('idle', '読', '読み札', '準備ができたら最初の札を読みます', '<kbd>Space</kbd> で読む');
+  if (spectating()) setYomi('idle', '読', '読み札', 'まもなく最初の札を読みます', 'CPU同士の対戦を観戦中');
+  else setYomi('idle', '読', '読み札', '準備ができたら最初の札を読みます', '<kbd>Space</kbd> で読む');
 }
 function showYomi(c, speakIt) {
   const tk = tokens(c.text);
   setYomi('live' + (c.special ? ' special' : ''), c.id, `${S.reads}枚目の読み札`,
     tk.map(t => `<span class="tk">${t.base ? `<ruby>${esc(t.base)}<rt>${esc(t.rt)}</rt></ruby>` : esc(t.ch)}</span>`).join(''),
-    '札を探して、右上のキーを押す');
+    spectating() ? 'CPUが札を探しています' : '札を探して、右上のキーを押す');
   void ui.yomi.offsetWidth;
   startReveal(tk);
-  if (speakIt) speak(speechText(c.text), () => stopReveal(true));
+  if (speakIt && speed() === 1) speak(speechText(c.text), () => stopReveal(true));
 }
 function setYomiTaken() {
   const lt = S.lastTake; if (!lt) return setYomiIdle();
   const c = BY_ID[lt.id], p = S.players[lt.pi];
   setYomi(`taken p${lt.pi + 1}`, c.id, `${p.name} が取りました · ${lt.t.toFixed(1)}秒`,
     tokens(c.text).map(t => `<span class="tk on">${t.base ? `<ruby>${esc(t.base)}<rt>${esc(t.rt)}</rt></ruby>` : esc(t.ch)}</span>`).join(''),
-    S.field.length ? '<kbd>Space</kbd> で次の札' : 'すべての札を取り終えました');
+    !S.field.length ? 'すべての札を取り終えました' : spectating() ? 'まもなく次の札' : '<kbd>Space</kbd> で次の札');
 }
 function startReveal(tk) {
   stopReveal(false);
   const spans = $$('.tk', ui.yText);
-  if (settings.reveal === 'instant' || reduced()) { spans.forEach(s => s.classList.add('on')); return; }
+  if (settings.reveal === 'instant' || reduced() || speed() > 1) { spans.forEach(s => s.classList.add('on')); return; }
   const unit = 1000 / ((settings.speak && canSpeak ? 7.2 : 10) * settings.rate);
   const at = []; let acc = 0; tk.forEach(x => { at.push(acc); acc += x.w * unit; });
   const t0 = performance.now(); let i = 0;
@@ -904,7 +1045,7 @@ function nextBanner() {
     { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: 0.12 },
     { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: 0.86 },
     { opacity: 0, transform: 'translate(-50%,-50%) scale(1.02)' }
-  ], { duration: reduced() ? 1600 : 2200, easing: 'ease-out' });
+  ], { duration: Math.max(800, (reduced() ? 1600 : 2200) / speed()), easing: 'ease-out' });
   a.onfinish = () => { ui.banner.hidden = true; nextBanner(); };
 }
 
@@ -956,7 +1097,7 @@ function renderSettings(el, pre) {
     settings.rate = parseFloat($(`#${pre}-rate`).value);
     settings.reveal = $(`#${pre}-reveal`).value;
     saveSettings();
-    if (S) { S.players[0].name = settings.p1; S.players[1].name = settings.p2; renderAll(); }
+    if (S) { S.players.forEach((p, i) => { if (p.type === 'human') p.name = i ? settings.p2 : settings.p1; }); renderAll(); }
   };
 }
 
@@ -985,10 +1126,106 @@ function clearRec(b) {
   store.set('kagura.records', []); renderRecords($('#rec-title'));
 }
 
+/* ===== 一括シミュレーション（CPU同士・画面なし。ルールは実対局と同じ newYaku / winnerOf） ===== */
+let lastSim = null;
+function simulate(n, st, cfg) {
+  const R = { n, wins: [0, 0], draws: 0, tieBreak: 0, total: 0, diff: 0, noYaku: 0, fouls: 0, yaku: {} };
+  YAKU.forEach(y => { R.yaku[y.name] = { games: 0, count: 0, wild: 0 }; });
+  const ids = CARDS.map(c => c.id);
+  for (let g = 0; g < n; g++) {
+    const queue = shuffle(ids), field = new Set(ids);
+    const P = st.map(s => ({ st: s, hand: new Set(), order: [], scored: [], score: 0 }));
+    // base秒の時点から、各CPUが次に手を出す時刻とお手つきかどうか
+    const roll = (base, f) => P.map(p => { const foul = Math.random() < CPU[p.st].foul; return { t: base + cpuDelay(p.st, f) * (foul ? 0.7 : 1), foul }; });
+    let guard = 0;
+    while (queue.length && guard++ < 2000) {
+      const cur = queue.pop();
+      if (!field.has(cur)) continue;
+      let tries = roll(0, 1), done = false;
+      while (!done) {
+        const i = tries[0].t <= tries[1].t ? 0 : 1, a = tries[i], p = P[i];
+        if (a.foul && field.size > 1) {
+          R.fouls++;
+          if (cfg.penalty === 'returnCard' && p.order.length) {
+            const back = p.order.pop(); p.hand.delete(back); field.add(back);
+            queue.splice(Math.floor(Math.random() * (queue.length + 1)), 0, back);
+          }
+          tries = roll(a.t, 0.6);
+        } else {
+          field.delete(cur); p.hand.add(cur); p.order.push(cur); done = true;
+          newYaku(c => p.hand.has(c), p.scored, cfg.wildcard, cur === WILD ? YAKU : YAKU_OF[cur]).forEach(({ y, wild }) => {
+            p.scored.push(y.name); p.score += y.cards.length;
+            R.yaku[y.name].count++; if (wild) R.yaku[y.name].wild++;
+          });
+        }
+      }
+    }
+    const got = new Set(); P.forEach(p => p.scored.forEach(nm => got.add(nm)));
+    got.forEach(nm => { R.yaku[nm].games++; });
+    if (!got.size) R.noYaku++;
+    const ps = P.map(p => ({ score: p.score, cards: p.hand.size }));
+    const w = winnerOf(ps);
+    if (w === null) R.draws++; else R.wins[w]++;
+    if (ps[0].score === ps[1].score && w !== null) R.tieBreak++;
+    R.total += ps[0].score + ps[1].score; R.diff += Math.abs(ps[0].score - ps[1].score);
+  }
+  return R;
+}
+function runSim(btn) {
+  const n = parseInt($('#sim-n').value, 10), st = [$('#sim-a').value, $('#sim-b').value];
+  const cfg = { wildcard: settings.wildcard, penalty: settings.penalty };
+  btn.disabled = true; btn.textContent = '計算中…';
+  setTimeout(() => {
+    lastSim = { R: simulate(n, st, cfg), st, cfg };
+    renderSim();
+    btn.disabled = false; btn.textContent = 'シミュレーションを実行';
+  }, 30);
+}
+function renderSim() {
+  const { R, st, cfg } = lastSim;
+  const pct = x => (x / R.n * 100).toFixed(1) + '%';
+  const rows = YAKU.map(y => Object.assign({ y, rate: R.yaku[y.name].games / R.n }, R.yaku[y.name]));
+  const max = Math.max(0.0001, ...rows.map(r => r.rate));
+  const rare = rows.filter(r => r.rate < 0.05).map(r => r.y.name), common = rows.filter(r => r.rate >= 0.5).map(r => r.y.name);
+  const ins = [];
+  if (rare.length) ins.push(`<li>ほとんど成立しない役（5%未満）：<b>${esc(rare.join('、'))}</b></li>`);
+  if (common.length) ins.push(`<li>半分以上の局で成立する役：<b>${esc(common.join('、'))}</b></li>`);
+  ins.push(`<li>役が1つも成立しない局：<b>${pct(R.noYaku)}</b> · 同点で枚数決着：<b>${pct(R.tieBreak)}</b></li>`);
+  $('#sim-out').innerHTML = `<div class="rec-sum">
+      <div><b>${pct(R.wins[0])}</b><span>CPU A（${CPU[st[0]].label}）の勝率</span></div>
+      <div><b>${pct(R.wins[1])}</b><span>CPU B（${CPU[st[1]].label}）の勝率</span></div>
+      <div><b>${pct(R.draws)}</b><span>引き分け</span></div>
+      <div><b>${(R.total / R.n).toFixed(1)}</b><span>1局の合計点（平均）</span></div>
+      <div><b>${(R.diff / R.n).toFixed(1)}</b><span>点差（平均）</span></div>
+    </div>
+    <ul class="sim-insight">${ins.join('')}</ul>
+    <div class="table-scroll"><table class="ytable"><thead><tr><th>役</th><th class="num">点</th><th>成立した局の割合</th><th class="num">切り札で成立</th></tr></thead><tbody>`
+    + rows.map(r => `<tr><td class="yn">${esc(r.y.name)}</td><td class="num pts">${r.y.cards.length}</td><td><span class="bar"><i style="width:${r.rate / max * 100}%"></i></span>${(r.rate * 100).toFixed(1)}%</td><td class="num">${r.count ? Math.round(r.wild / r.count * 100) + '%' : '—'}</td></tr>`).join('')
+    + `</tbody></table></div>
+    <p class="sim-note" style="margin-top:12px">${R.n.toLocaleString()}局 · 切り札 ${cfg.wildcard ? 'ON' : 'OFF'} · お手つき ${cfg.penalty === 'returnCard' ? '1枚返す' : 'なし'} · お手つき発生 ${(R.fouls / R.n).toFixed(1)}回/局</p>
+    <div class="rec-actions"><button class="btn ghost" data-act="copy-sim">CSVをコピー</button></div>`;
+}
+function simCSV() {
+  if (!lastSim) return '';
+  const { R, st, cfg } = lastSim;
+  const meta = `"${R.n}局 / CPU A ${CPU[st[0]].label} / CPU B ${CPU[st[1]].label} / 切り札 ${cfg.wildcard ? 'ON' : 'OFF'} / お手つき ${cfg.penalty === 'returnCard' ? '1枚返す' : 'なし'}"`;
+  const head = '役,点,成立した局の割合(%),成立回数,切り札で成立した回数';
+  const rows = YAKU.map(y => { const s = R.yaku[y.name]; return [y.name, y.cards.length, (s.games / R.n * 100).toFixed(1), s.count, s.wild].join(','); });
+  return [meta, head, ...rows].join('\n');
+}
+
+/* ===== タイトル：対戦の組み合わせ ===== */
+function renderModeRow() {
+  $$('.seg-b').forEach(b => b.setAttribute('aria-checked', String(b.dataset.mode === settings.mode)));
+  const el = $('#cpu-opts');
+  if (settings.mode === 'hh') el.textContent = '1台のMacを2人で使います。取ったら 1 か 2 で取った人を選びます';
+  else if (settings.mode === 'hc') el.innerHTML = `<label>CPU の強さ<select class="select" id="m-cpu2">${cpuOptions(settings.cpu2)}</select></label><span>札のキーを押せば、そのままあなたが取ります</span>`;
+  else el.innerHTML = `<label>CPU A<select class="select" id="m-cpu1">${cpuOptions(settings.cpu1)}</select></label><label>CPU B<select class="select" id="m-cpu2">${cpuOptions(settings.cpu2)}</select></label>`;
+}
+
 /* ===== 結果 ===== */
 function showResult() {
-  const [a, b] = S.players;
-  const w = a.score !== b.score ? (a.score > b.score ? 0 : 1) : a.hand.length !== b.hand.length ? (a.hand.length > b.hand.length ? 0 : 1) : null;
+  const w = winnerOf(S.players.map(p => ({ score: p.score, cards: p.hand.length })));
   const avg = t => t.length ? (t.reduce((x, y) => x + y, 0) / t.length).toFixed(1) + '秒' : '—';
   $('#result').innerHTML = `<p class="eyebrow">対局終了</p><h2 class="res-title">${w === null ? '引き分け' : esc(S.players[w].name) + ' の勝ち'}</h2>`
     + `<div class="res-cols">${S.players.map((p, i) => `<div class="res-col p${i + 1}${w === i ? ' win' : ''}"><div class="res-name">${esc(p.name)}</div><div class="res-score"><b>${p.score}</b>点</div>`
@@ -1016,9 +1253,9 @@ function openModal(id) {
 }
 function closeModal() { if (!openM) return; $('#' + openM).hidden = true; openM = null; }
 function toTitle() {
-  speechStop(); clearTimeout(autoTimer); stopReveal(false);
+  speechStop(); clearTimeout(autoTimer); clearCpu(); stopReveal(false);
   bannerQ.length = 0; bannerDone = null; ui.banner.hidden = true;
-  S = null; closeModal(); showScreen('title'); selectTab('how');
+  S = null; closeModal(); showScreen('title'); selectTab('how'); renderModeRow();
 }
 function selectTab(name) {
   $$('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
@@ -1038,7 +1275,8 @@ const ACTS = {
   'open-yaku': () => openModal('m-yaku'), 'open-log': () => openModal('m-log'), 'open-settings': () => openModal('m-settings'),
   quit: () => (S && S.phase !== 'over' ? openModal('m-quit') : toTitle()), 'quit-yes': toTitle, close: closeModal,
   'choose-0': () => resolve(0), 'choose-1': () => resolve(1),
-  'copy-result': b => copyText(resultText(), b), 'copy-csv': b => copyText(csv(), b), 'clear-rec': clearRec
+  'copy-result': b => copyText(resultText(), b), 'copy-csv': b => copyText(csv(), b), 'clear-rec': clearRec,
+  pause: togglePause, speed: cycleSpeed, 'run-sim': runSim, 'copy-sim': b => copyText(simCSV(), b)
 };
 
 /* ===== 入力 ===== */
@@ -1047,6 +1285,8 @@ function onClick(e) {
   if (t.classList && t.classList.contains('mback')) { if (t.id !== 'm-result') closeModal(); return; }
   const card = t.closest('#board .card');
   if (card) { if (S && S.phase !== 'pick') pickCard(card.dataset.id); return; }
+  const md = t.closest('[data-mode]');
+  if (md) { settings.mode = md.dataset.mode; saveSettings(); renderModeRow(); return; }
   const b = t.closest('[data-act]');
   if (b) { const f = ACTS[b.dataset.act]; if (f) f(b); if (b.tagName === 'BUTTON' && e.detail > 0) b.blur(); return; }
   const tab = t.closest('[data-tab]');
@@ -1065,6 +1305,12 @@ function onKey(e) {
   }
   if (screen === 'title') { if (code === 'Enter' && !e.repeat) { e.preventDefault(); startGame(); } return; }
   if (!S) return;
+  if (spectating()) {
+    if (code === 'Space') { e.preventDefault(); if (!e.repeat) togglePause(); }
+    else if (code === 'Tab') { e.preventDefault(); openModal('m-yaku'); }
+    else if (BY_CODE[code] && !e.repeat) pickCard(BY_CODE[code].id);
+    return;
+  }
   if (code === 'Space') { e.preventDefault(); if (!e.repeat) nextCard(); return; }
   if (e.repeat) return;
   if (S.phase === 'pick') {
@@ -1089,12 +1335,19 @@ function init() {
   Object.assign(ui, {
     title: $('#title'), game: $('#game'), board: $('#board'), wrap: $('#board-wrap'),
     pp: [$('#pp0'), $('#pp1')], yomi: $('#yomi'), yStamp: $('#yomi-stamp'), yLabel: $('#yomi-label'), yText: $('#yomi-text'), yHint: $('#yomi-hint'),
-    bNext: $('#b-next'), bReread: $('#b-reread'), bHint: $('#b-hint'), nRead: $('#n-read'), nField: $('#n-field'), flags: $('#flags'),
+    bNext: $('#b-next'), bReread: $('#b-reread'), bHint: $('#b-hint'), bPause: $('#b-pause'), bSpeed: $('#b-speed'), nRead: $('#n-read'), nField: $('#n-field'), flags: $('#flags'),
     pick: $('#pick'), pickCard: $('#pick-card'), pickN: [$('#pick-n0'), $('#pick-n1')], toast: $('#toast'), banner: $('#banner'),
     loglist: $('#loglist'), yakuBody: $('#yaku-body')
   });
   document.documentElement.style.setProperty('--seigaiha', `url("data:image/svg+xml,${encodeURIComponent(seigaiha())}")`);
   $('#sample').innerHTML = cardHTML(BY_ID['あ']);
+  $('#sim-a').innerHTML = cpuOptions('normal'); $('#sim-b').innerHTML = cpuOptions('normal');
+  $('#cpu-opts').onchange = e => {
+    if (e.target.id === 'm-cpu1') settings.cpu1 = e.target.value;
+    if (e.target.id === 'm-cpu2') settings.cpu2 = e.target.value;
+    saveSettings();
+  };
+  renderModeRow();
   document.addEventListener('click', onClick);
   window.addEventListener('keydown', onKey);
   if (window.ResizeObserver) new ResizeObserver(fitBoard).observe(ui.wrap);
@@ -1102,12 +1355,16 @@ function init() {
 }
 function restore(saved) {
   S = saved; S.readAt = performance.now();
+  S.mode = S.mode || 'hh';
+  S.players.forEach(p => { p.type = p.type || 'human'; });
   showScreen('game'); buildBoard();
   if (S.phase === 'reading' || S.phase === 'pick') { showYomi(BY_ID[S.current], false); stopReveal(true); }
   else if (S.lastTake) setYomiTaken(); else setYomiIdle();
   if (S.phase === 'pick') { slotEl(S.pending).classList.add('sel'); showPick(S.pending); }
   renderAll();
   if (S.phase === 'over') showResult();
+  else if (S.phase === 'reading') scheduleCpu(1);
+  else if (S.phase === 'idle' && spectating() && !S.paused) scheduleNext(600);
 }
 function boot(data) {
   init();
