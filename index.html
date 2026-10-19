@@ -474,7 +474,7 @@ const fmtDate = ts => { const d = new Date(ts); return `${d.getFullYear()}-${pad
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 /* ===== 設定（このブラウザに保存） ===== */
-const DEFAULTS = { p1: 'プレイヤー1', p2: 'プレイヤー2', wildcard: true, penalty: 'returnCard', speak: true, rate: 1, reveal: 'sync', sfx: true, autoNext: false, mode: 'hh', cpu1: 'normal', cpu2: 'normal', speed: 1 };
+const DEFAULTS = { p1: 'プレイヤー1', p2: 'プレイヤー2', wildcard: true, penalty: 'returnCard', speak: true, rate: 1, reveal: 'sync', sfx: true, autoNext: false, mode: 'hh', cpu1: 'normal', cpu2: 'auto', speed: 1 };
 const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
@@ -567,21 +567,26 @@ function newYaku(has, scored, wildcardOn, candidates = YAKU) {
 const winnerOf = ps => ps[0].score !== ps[1].score ? (ps[0].score > ps[1].score ? 0 : 1) : ps[0].cards !== ps[1].cards ? (ps[0].cards > ps[1].cards ? 0 : 1) : null;
 
 /* ===== CPU ===== */
-// mean: 読み始めから取るまでの平均秒数 / foul: 違う札に手を出す確率
-// 1枚を競ったとき、つよい対ふつうで約66%、つよい対よわいで約78%つよい方が取る
+// mean: 読み始めから取るまでの平均秒数。人が40枚から札を探してキーを押す時間に合わせた値 / foul: 違う札に手を出す確率
+// 1枚を競ったとき、つよい対ふつうで約69%、つよい対よわいで約84%つよい方が取る
 const CPU = {
-  weak: { label: 'よわい', mean: 2.6, foul: 0.07 },
-  normal: { label: 'ふつう', mean: 2.0, foul: 0.04 },
-  strong: { label: 'つよい', mean: 1.5, foul: 0.02 }
+  weak: { label: 'よわい', mean: 7.0, foul: 0.07 },
+  normal: { label: 'ふつう', mean: 5.0, foul: 0.04 },
+  strong: { label: 'つよい', mean: 3.5, foul: 0.02 },
+  auto: { label: 'あなたに合わせる', mean: 5.0, foul: 0.04 }
 };
+// 「あなたに合わせる」：CPUが取ったら遅く、人が取ったら速くする。人が6割ほど取れるところで落ち着く
+const AUTO_SLOWER = 1.12, AUTO_FASTER = 0.92, AUTO_MIN = 1.5, AUTO_MAX = 15;
 const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
-const cpuDelay = (st, factor = 1) => CPU[st].mean * Math.exp(gauss() * 0.5) * factor;
-const cpuOptions = sel => Object.entries(CPU).map(([k, v]) => `<option value="${k}"${k === sel ? ' selected' : ''}>${v.label}</option>`).join('');
+const cpuMean = st => st === 'auto' ? ((S && S.autoMean) || CPU.auto.mean) : CPU[st].mean;
+const cpuDelay = (st, factor = 1) => cpuMean(st) * Math.exp(gauss() * 0.5) * factor;
+const cpuOptions = (sel, withAuto) => Object.entries(CPU).filter(([k]) => withAuto || k !== 'auto').map(([k, v]) => `<option value="${k}"${k === sel ? ' selected' : ''}>${v.label}</option>`).join('');
+const noAuto = st => st === 'auto' ? 'normal' : st;
 function seats() {
   const m = settings.mode;
   const cpu = (st, tag) => ({ type: 'cpu', strength: st, name: `CPU${tag}（${CPU[st].label}）` });
   if (m === 'hc') return [{ type: 'human', name: settings.p1 }, cpu(settings.cpu2, '')];
-  if (m === 'cc') return [cpu(settings.cpu1, ' A'), cpu(settings.cpu2, ' B')];
+  if (m === 'cc') return [cpu(noAuto(settings.cpu1), ' A'), cpu(noAuto(settings.cpu2), ' B')];
   return [{ type: 'human', name: settings.p1 }, { type: 'human', name: settings.p2 }];
 }
 
@@ -694,7 +699,7 @@ const mkPlayer = seat => ({ name: seat.name, type: seat.type, strength: seat.str
 function newState() {
   const ids = CARDS.map(c => c.id);
   return {
-    mode: settings.mode, phase: 'idle', paused: false, slots: shuffle(ids), field: ids.slice(), queue: shuffle(ids),
+    mode: settings.mode, phase: 'idle', paused: false, autoMean: CPU.auto.mean, slots: shuffle(ids), field: ids.slice(), queue: shuffle(ids),
     current: null, readAt: 0, reads: 0, pending: null, lastTake: null,
     players: seats().map(mkPlayer),
     log: [], startedAt: Date.now(), endedAt: 0, hints: 0, saved: false
@@ -809,6 +814,9 @@ function resolve(pi) {
     const t = (performance.now() - S.readAt) / 1000;
     S.field.splice(S.field.indexOf(id), 1); p.hand.push(id); p.times.push(t);
     S.current = null; S.phase = 'idle'; S.lastTake = { id, pi, t };
+    if (S.players.some(q => q.strength === 'auto')) {
+      S.autoMean = p.type === 'cpu' ? Math.min(AUTO_MAX, S.autoMean * AUTO_SLOWER) : Math.max(AUTO_MIN, S.autoMean * AUTO_FASTER);
+    }
     stopReveal(true); speechStop();
     log(`${p.name} が「${cardLabel(id)}」を取った（${t.toFixed(1)}秒）`, 'take', pi);
     flyToPanel(slot, pi);
@@ -922,7 +930,7 @@ function panelHTML(pi) {
   const p = S.players[pi], near = nearYaku(pi);
   const badge = p.type === 'cpu' ? '<span class="pp-key wide">CPU</span>' : humans().length === 1 ? '<span class="pp-key wide">あなた</span>' : `<span class="pp-key">${pi + 1}</span>`;
   return `<div class="pp-head">${badge}<span class="pp-name">${esc(p.name)}</span><span class="pp-score"><b>${p.score}</b>点</span></div>`
-    + `<div class="pp-meta"><span>取り札 <b>${p.hand.length}</b></span><span>お手つき <b>${p.fouls}</b></span>${p.hand.includes(WILD) ? '<span class="wild">切り札あり</span>' : ''}</div>`
+    + `<div class="pp-meta"><span>取り札 <b>${p.hand.length}</b></span><span>お手つき <b>${p.fouls}</b></span>${p.type === 'cpu' ? `<span>平均 <b>${cpuMean(p.strength).toFixed(1)}</b>秒</span>` : ''}${p.hand.includes(WILD) ? '<span class="wild">切り札あり</span>' : ''}</div>`
     + `<div class="pp-seals">${p.scored.length ? p.scored.map(n => `<span class="seal-y">${esc(n)}</span>`).join('') : '<span class="pp-empty">役はまだありません</span>'}</div>`
     + `<div class="pp-near">${near.map(x => `<div class="near${x.need - x.have === 1 ? ' reach' : ''}"><span class="near-n">${esc(x.y.name)}</span><span class="near-bar"><i style="width:${Math.round(x.have / x.need * 100)}%"></i></span><span class="near-c">${x.have}/${x.need}</span></div>`).join('')}</div>`;
 }
@@ -1226,8 +1234,8 @@ function renderModeRow() {
   $$('.seg-b').forEach(b => b.setAttribute('aria-checked', String(b.dataset.mode === settings.mode)));
   const el = $('#cpu-opts');
   if (settings.mode === 'hh') el.textContent = '1台のMacを2人で使います。取ったら 1 か 2 で取った人を選びます';
-  else if (settings.mode === 'hc') el.innerHTML = `<label>CPU の強さ<select class="select" id="m-cpu2">${cpuOptions(settings.cpu2)}</select></label><span>札のキーを押せば、そのままあなたが取ります</span>`;
-  else el.innerHTML = `<label>CPU A<select class="select" id="m-cpu1">${cpuOptions(settings.cpu1)}</select></label><label>CPU B<select class="select" id="m-cpu2">${cpuOptions(settings.cpu2)}</select></label>`;
+  else if (settings.mode === 'hc') el.innerHTML = `<label>CPU の強さ<select class="select" id="m-cpu2">${cpuOptions(settings.cpu2, true)}</select></label><span>${settings.cpu2 === 'auto' ? 'あなたの速さに合わせて、CPUが速くも遅くもなります' : `CPUは平均${CPU[settings.cpu2].mean}秒で札を取ります`}</span>`;
+  else el.innerHTML = `<label>CPU A<select class="select" id="m-cpu1">${cpuOptions(noAuto(settings.cpu1))}</select></label><label>CPU B<select class="select" id="m-cpu2">${cpuOptions(noAuto(settings.cpu2))}</select></label>`;
 }
 
 /* ===== 結果 ===== */
@@ -1352,7 +1360,7 @@ function init() {
   $('#cpu-opts').onchange = e => {
     if (e.target.id === 'm-cpu1') settings.cpu1 = e.target.value;
     if (e.target.id === 'm-cpu2') settings.cpu2 = e.target.value;
-    saveSettings();
+    saveSettings(); renderModeRow();
   };
   renderModeRow();
   document.addEventListener('click', onClick);
