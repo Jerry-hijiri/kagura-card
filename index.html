@@ -248,6 +248,17 @@ kbd{font-family:var(--body);font-size:12px;font-weight:500;line-height:1;padding
 .ystat{font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--muted)}
 .ystat .ok{display:inline-block;padding:2px 8px;border-radius:4px;font-weight:700;font-family:var(--display);background:var(--pcs);color:var(--pc)}
 
+/* 読み札帳 */
+.ylist{list-style:none;margin:0;padding:0;max-height:60vh;overflow-y:auto}
+.yrow{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:12px;align-items:start;padding:10px 4px;border-bottom:1px solid var(--line)}
+.yrow:last-child{border-bottom:0}
+.ystamp{width:28px;height:28px;border-radius:var(--r-s);background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:13px;flex:none}
+.yrow.special .ystamp{background:var(--gold);color:var(--bg)}
+.ysent{margin:0;font-size:13px;line-height:1.7}
+.ysent b{color:var(--gold)}
+.ygod{text-align:right;white-space:nowrap;font-family:var(--display);font-weight:700;color:var(--fg);font-size:13px;padding-top:2px}
+@media (max-width:480px){.yrow{grid-template-columns:24px minmax(0,1fr)}.ygod{grid-column:2;text-align:left;padding-top:0;color:var(--muted);font-weight:500}}
+
 /* log */
 .loglist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column-reverse}
 .loglist li{display:grid;grid-template-columns:40px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
@@ -384,6 +395,7 @@ kbd{font-family:var(--body);font-size:12px;font-weight:500;line-height:1;padding
       <div class="start-row">
         <button class="btn primary big" data-act="start">はじめる <kbd>Enter</kbd></button>
         <button class="btn ghost" data-act="open-yaku">役一覧を見る</button>
+        <button class="btn ghost" data-act="open-yomi">読み札帳を見る</button>
       </div>
     </div>
   </div>
@@ -396,6 +408,7 @@ kbd{font-family:var(--body);font-size:12px;font-weight:500;line-height:1;padding
     <div class="progress"><span>読んだ札 <b id="n-read">0</b> / 40</span><span>場の札 <b id="n-field">40</b></span><span id="flags"></span></div>
     <div class="tools">
       <button class="btn ghost" data-act="open-yaku">役一覧 <kbd>Tab</kbd></button>
+      <button class="btn ghost" data-act="open-yomi">読み札帳</button>
       <button class="btn ghost" data-act="open-log">ログ</button>
       <button class="btn ghost" data-act="open-settings">設定</button>
       <button class="btn ghost" data-act="quit">終了</button>
@@ -441,6 +454,12 @@ kbd{font-family:var(--body);font-size:12px;font-weight:500;line-height:1;padding
   <h2>役一覧</h2>
   <p class="sub">役の枚数＝点数。切り札（ん）は、2枚以上の役で足りない1枚の代わりになります。</p>
   <div id="yaku-body"></div>
+</div></div>
+<div class="mback" id="m-yomi" hidden><div class="modal" style="max-width:640px">
+  <button class="btn ghost mclose" data-act="close">閉じる <kbd>Esc</kbd></button>
+  <h2>読み札帳</h2>
+  <p class="sub">全<span id="yomi-count">40</span>枚の読み札文と神様の名前です。</p>
+  <ol class="ylist" id="yomi-list"></ol>
 </div></div>
 <div class="mback drawer" id="m-log" hidden><div class="modal">
   <button class="btn ghost mclose" data-act="close">閉じる</button>
@@ -1089,6 +1108,21 @@ function renderYaku() {
     + '</tbody></table></div>';
 }
 
+/* ===== 読み札帳 ===== */
+// 文中、最後の空白以降を神様の名前として太字にする
+function highlightGod(text) {
+  const i = Math.max(text.lastIndexOf(' '), text.lastIndexOf('　'));
+  return i < 0 ? esc(text) : esc(text.slice(0, i)) + ' <b>' + esc(text.slice(i + 1)) + '</b>';
+}
+function renderYomiList() {
+  ui.yomiCount.textContent = CARDS.length;
+  ui.yomiList.innerHTML = CARDS.map(c =>
+    `<li class="yrow${c.special ? ' special' : ''}"><span class="ystamp">${c.id}</span>`
+    + `<p class="ysent">${highlightGod(c.text)}</p>`
+    + `<span class="ygod">${esc(cardLabel(c.id))}</span></li>`
+  ).join('');
+}
+
 /* ===== 設定フォーム ===== */
 function renderSettings(el, pre) {
   const sw = (k, label, note) => `<div class="frow"><label for="${pre}-${k}">${label}${note ? `<small>${note}</small>` : ''}</label><input type="checkbox" class="switch" id="${pre}-${k}" ${settings[k] ? 'checked' : ''}></div>`;
@@ -1262,6 +1296,7 @@ function openModal(id) {
   if (openM) $('#' + openM).hidden = true;
   openM = id;
   if (id === 'm-yaku') renderYaku();
+  if (id === 'm-yomi') renderYomiList();
   if (id === 'm-log') renderLog();
   if (id === 'm-settings') renderSettings($('#set-game'), 'sg');
   $('#' + id).hidden = false;
@@ -1287,7 +1322,7 @@ function copyText(text, btn) {
 
 const ACTS = {
   start: startGame, again: startGame, 'to-title': toTitle, next: nextCard, reread, hint,
-  'open-yaku': () => openModal('m-yaku'), 'open-log': () => openModal('m-log'), 'open-settings': () => openModal('m-settings'),
+  'open-yaku': () => openModal('m-yaku'), 'open-yomi': () => openModal('m-yomi'), 'open-log': () => openModal('m-log'), 'open-settings': () => openModal('m-settings'),
   quit: () => (S && S.phase !== 'over' ? openModal('m-quit') : toTitle()), 'quit-yes': toTitle, close: closeModal,
   'choose-0': () => resolve(0), 'choose-1': () => resolve(1),
   'copy-result': b => copyText(resultText(), b), 'copy-csv': b => copyText(csv(), b), 'clear-rec': clearRec,
@@ -1352,7 +1387,7 @@ function init() {
     pp: [$('#pp0'), $('#pp1')], yomi: $('#yomi'), yStamp: $('#yomi-stamp'), yLabel: $('#yomi-label'), yText: $('#yomi-text'), yHint: $('#yomi-hint'),
     bNext: $('#b-next'), bReread: $('#b-reread'), bHint: $('#b-hint'), bPause: $('#b-pause'), bSpeed: $('#b-speed'), nRead: $('#n-read'), nField: $('#n-field'), flags: $('#flags'),
     pick: $('#pick'), pickCard: $('#pick-card'), pickN: [$('#pick-n0'), $('#pick-n1')], toast: $('#toast'), banner: $('#banner'),
-    loglist: $('#loglist'), yakuBody: $('#yaku-body')
+    loglist: $('#loglist'), yakuBody: $('#yaku-body'), yomiList: $('#yomi-list'), yomiCount: $('#yomi-count')
   });
   document.documentElement.style.setProperty('--seigaiha', `url("data:image/svg+xml,${encodeURIComponent(seigaiha())}")`);
   $('#sample').innerHTML = cardHTML(BY_ID['あ']);
