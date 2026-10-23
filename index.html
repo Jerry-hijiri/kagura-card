@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap">
 <style>
-/* layout: 夜の神楽殿。ゲーム面は「上=2人の陣と読み札 / 下=40枚の場(10×4)」。タイトルは縦書きロゴと注連縄 */
+/* layout: 夜の神楽殿。ゲーム面は「上=2人の陣と読み札 / 下=札の場(自動で列数調整)」。タイトルは縦書きロゴと注連縄 */
 :root{
   color-scheme:dark;
   --bg:#110c09;--bg-2:#18110d;--surface:#201712;--surface-2:#2a1f18;--surface-3:#382a20;
@@ -368,7 +368,7 @@ kbd{font-family:var(--body);font-size:12px;font-weight:500;line-height:1;padding
           <li>手札で<b>役</b>がそろうと、その場で加点（役の枚数＝点数）</li>
           <li>違う札を取ると<b>お手つき</b>。最後に取った札を1枚、場に返す</li>
           <li><b>切り札（ん）</b>は、2枚以上の役で足りない1枚の代わりになる</li>
-          <li>40枚を取り終えたら終了。点数の多い方が勝ち（同点なら取り札の多い方）</li>
+          <li><span class="js-total">40</span>枚を取り終えたら終了。点数の多い方が勝ち（同点なら取り札の多い方）</li>
         </ul>
       </div>
       <div class="tpanel" data-panel="set" hidden><div id="set-title"></div></div>
@@ -405,7 +405,7 @@ kbd{font-family:var(--body);font-size:12px;font-weight:500;line-height:1;padding
 <div id="game" class="screen game" hidden>
   <header class="topbar">
     <div class="brand">神楽かるた</div>
-    <div class="progress"><span>読んだ札 <b id="n-read">0</b> / 40</span><span>場の札 <b id="n-field">40</b></span><span id="flags"></span></div>
+    <div class="progress"><span>読んだ札 <b id="n-read">0</b> / <span class="js-total">40</span></span><span>場の札 <b id="n-field">40</b></span><span id="flags"></span></div>
     <div class="tools">
       <button class="btn ghost" data-act="open-yaku">役一覧 <kbd>Tab</kbd></button>
       <button class="btn ghost" data-act="open-yomi">読み札帳</button>
@@ -501,7 +501,7 @@ const store = {
 let settings = Object.assign({}, DEFAULTS, store.get('kagura.settings', {}));
 const saveSettings = () => store.set('kagura.settings', settings);
 
-/* ===== 札データ（40枚 = 清音39＋切り札1） ===== */
+/* ===== 札データ（39枚 = 清音38＋切り札1。瀬織津姫は宇目神楽に出ないため「せ」ごと削除） ===== */
 const CARDS = [
   { id: 'あ', key: '1', kanji: '素戔嗚みこと', el: 'sword', art: 'sword', text: 'あらぶる英雄、八岐大蛇（やまたのおろち）を退治した すさのおのみこと' },
   { id: 'い', key: '2', kanji: '天鈿女命', el: 'heaven', art: 'fan', text: 'いわとの前で楽しく踊る、芸能の神 あまのうずめのみこと' },
@@ -516,7 +516,6 @@ const CARDS = [
   { id: 'さ', key: 'q', kanji: 'ニニギのみこと', el: 'heaven', art: 'magatama', text: 'さんしゅの神器（じんぎ）を携えて、地上へ降りた ににぎのみこと' },
   { id: 'し', key: 'w', kanji: '磐裂神', el: 'rock', art: 'crack', text: 'しずくが剣（つるぎ）から滴り生まれた、岩を裂く神 いわさく' },
   { id: 'す', key: 'e', kanji: '経津主命', el: 'sword', art: 'swords', text: 'するどい刀の威力を宿す、剣（つるぎ）の武神 ふつぬしのみこと' },
-  { id: 'せ', key: 'r', kanji: '瀬織津姫', el: 'water', art: 'river', text: 'せせらぎの穢れを祓い清める、川の女神 せおりつひめ' },
   { id: 'そ', key: 't', kanji: '足名椎', el: 'love', art: 'tears', text: 'そだてた娘を想って涙する、老いた神様 あしなづち' },
   { id: 'た', key: 'y', kanji: '八岐大蛇', el: 'serpent', art: 'serpent', text: 'たくさんの頭と尾を持つ、恐ろしい大蛇 やまたのおろち' },
   { id: 'ち', key: 'u', kanji: '天手力男尊', el: 'rock', art: 'door', text: 'ちから強く重い天岩戸（あまのいわと）をこじ開けた たちからおのみこと' },
@@ -586,7 +585,7 @@ function newYaku(has, scored, wildcardOn, candidates = YAKU) {
 const winnerOf = ps => ps[0].score !== ps[1].score ? (ps[0].score > ps[1].score ? 0 : 1) : ps[0].cards !== ps[1].cards ? (ps[0].cards > ps[1].cards ? 0 : 1) : null;
 
 /* ===== CPU ===== */
-// mean: 読み始めから取るまでの平均秒数。人が40枚から札を探してキーを押す時間に合わせた値 / foul: 違う札に手を出す確率
+// mean: 読み始めから取るまでの平均秒数。人が札の山から探してキーを押す時間に合わせた値 / foul: 違う札に手を出す確率
 // 1枚を競ったとき、つよい対ふつうで約69%、つよい対よわいで約84%つよい方が取る
 const CPU = {
   weak: { label: 'よわい', mean: 7.0, foul: 0.07 },
@@ -1390,6 +1389,7 @@ function init() {
     loglist: $('#loglist'), yakuBody: $('#yaku-body'), yomiList: $('#yomi-list'), yomiCount: $('#yomi-count')
   });
   document.documentElement.style.setProperty('--seigaiha', `url("data:image/svg+xml,${encodeURIComponent(seigaiha())}")`);
+  $$('.js-total').forEach(el => { el.textContent = CARDS.length; });
   $('#sample').innerHTML = cardHTML(BY_ID['あ']);
   $('#sim-a').innerHTML = cpuOptions('normal'); $('#sim-b').innerHTML = cpuOptions('normal');
   $('#cpu-opts').onchange = e => {
