@@ -496,7 +496,7 @@ const store = {
 let settings = Object.assign({}, DEFAULTS, store.get('kagura.settings', {}));
 const saveSettings = () => store.set('kagura.settings', settings);
 
-/* ===== 札データ（39枚 = 清音38＋切り札1。瀬織津姫は宇目神楽に出ないため「せ」ごと削除） ===== */
+/* ===== 札データ（38枚 = 清音37＋切り札1。瀬織津姫・伊邪那岐命は宇目神楽に出ないため「せ」「む」ごと削除） ===== */
 const CARDS = [
   { id: 'あ', key: '1', kanji: '素戔嗚みこと', el: 'sword', art: 'sword', text: 'あらぶる英雄、八岐大蛇（やまたのおろち）を退治した すさのおのみこと' },
   { id: 'い', key: '2', kanji: '天鈿女命', el: 'heaven', art: 'fan', text: 'いわとの前で楽しく踊る、芸能の神 あまのうずめのみこと' },
@@ -527,7 +527,6 @@ const CARDS = [
   { id: 'ほ', key: 'k', kanji: '火照命', el: 'fire', art: 'flame', text: 'ほのおの中で最初に生まれた、長男の神 ほほでりのみこと' },
   { id: 'ま', key: 'l', kanji: '天太玉命', el: 'heaven', art: 'gohei', text: 'まつりの道具を準備する、占いの神 あまのふとだま' },
   { id: 'み', key: 'z', kanji: '八百万の神', el: 'many', art: 'crowd', num: '③', text: 'みっつの宝を祝福する、にぎやかな神 やおよろず（③）' },
-  { id: 'む', key: 'x', kanji: '伊邪那岐命', el: 'heaven', art: 'spear', text: 'むかし国を生み出した、最初の父神 いざなぎのみこと' },
   { id: 'め', key: 'c', kanji: '磐筒女神', el: 'rock', art: 'pillar2', text: 'めがみの岩の神、強い武神の仲間である いわつつのめのかみ' },
   { id: 'も', key: 'v', kanji: '迦具土命', el: 'fire', art: 'flame', text: 'もえさかる炎から生まれた、火の神様 かぐつちのみこと' },
   { id: 'や', key: 'b', kanji: '山雷命', el: 'thunder', art: 'thunder', text: 'やまやまに激しい雷鳴を轟（とどろ）かせる、雷の神 やまいかづちのみこと' },
